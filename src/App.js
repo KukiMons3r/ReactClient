@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import io from "socket.io-client";
 import "./App.css";
 
-const socket = io.connect("http://localhost:4000");
+const socket = io.connect("https://bens-test-node-app.herokuapp.com/");
 
 function App() {
   const [State, SetState] = useState({
@@ -34,7 +34,7 @@ function App() {
     <div className="App">
       <div className="card">
         <form onSubmit={onSubmit}>
-          <h1>Messenger</h1>
+          <h1>MessengerTest</h1>
           <div className="name-field">
             <textarea
               name="name"
