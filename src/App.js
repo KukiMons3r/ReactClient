@@ -1,69 +1,46 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import io from "socket.io-client";
 import "./App.css";
+import Chat from "./Chat";
 
-const socket = io.connect("https://bens-test-node-app.herokuapp.com/");
+const socket = io.connect("https://bens-test-node-app.herokuapp.com");
 
 function App() {
-  const [State, SetState] = useState({
-    message: "",
-    name: "",
-  });
+  const [Username, SetUsername] = useState("");
+  const [Room, Setroom] = useState("");
+  const [showChat, SetshowChat] = useState(false);
 
-  const [Chat, SetChat] = useState([]);
-
-  useEffect(() => {
-    socket.on("message", ({ name, message }) => {
-      SetChat([...Chat, { name, message }]);
-    });
-  });
-
-  const onTextChange = (e) => {
-    SetState({ ...State, [e.target.name]: e.target.value });
-  };
-
-  const onSubmit = (e) => {
-    e.preventDefault();
-
-    const { name, message } = State;
-    socket.emit("message", { name, message });
-    SetState({ message: "", name });
+  const JoinRoom = () => {
+    if (Username !== "" && Room !== "") {
+      socket.emit("join_room", Room);
+      SetshowChat(true);
+    }
   };
 
   return (
     <div className="App">
-      <div className="card">
-        <form onSubmit={onSubmit}>
-          <h1>MessengerTest</h1>
-          <div className="name-field">
-            <textarea
-              name="name"
-              onChange={(e) => onTextChange(e)}
-              value={State.name}
-            ></textarea>
-          </div>
-          <div>
-            <textarea
-              name="message"
-              onChange={(e) => onTextChange(e)}
-              value={State.message}
-            ></textarea>
-          </div>
-          <button>Send Message</button>
-        </form>
-        <div className="render-chat">
-          <h1>Chat Log</h1>
-          {Chat.map(({ name, message }, index) => {
-            return (
-              <div key={index}>
-                <h3>
-                  {name}: <span>{message}</span>
-                </h3>
-              </div>
-            );
-          })}
+      {!showChat ? (
+        <div className="joinChatContainer">
+          <h3>Chat</h3>
+          <input
+            type={"text"}
+            placeholder="Név..."
+            onChange={(e) => {
+              SetUsername(e.target.value);
+            }}
+          />
+          <input
+            type={"text"}
+            placeholder="Szoba száma..."
+            onChange={(e) => {
+              Setroom(e.target.value);
+            }}
+          />
+          <button onClick={JoinRoom}>Csatlakozás</button>
         </div>
-      </div>
+      ) : (
+        <Chat socket={socket} username={Username} room={Room} />
+      )}
     </div>
   );
 }
