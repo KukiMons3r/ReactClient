@@ -8,7 +8,7 @@ function Chat({ socket, username, room }) {
 
   const FetchData = (room) => {
     axios
-      .get("https://bens-test-node-app.herokuapp.com/" + room)
+      .get("https://bens-test-node-app.herokuapp.com/GetAllMessage/" + room)
       .then((res) => {
         SetMessageList(res.data);
       })
