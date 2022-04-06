@@ -71,6 +71,7 @@
     color: #fff;
     font-weight: 700;
     line-height: 45px;
+    cursor: default;
   }
   
   .chat-window .chat-body {
@@ -83,7 +84,7 @@
   .chat-window .chat-body .message-container {
     width: 100%;
     height: 100%;
-    overflow-y: scroll;
+    overflow-y: hidden;
     overflow-x: hidden;
   }
   

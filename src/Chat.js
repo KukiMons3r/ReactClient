@@ -1,9 +1,34 @@
 import React, { useEffect, useState } from "react";
 import ScrollToBottom from "react-scroll-to-bottom";
+import axios from "axios";
 
 function Chat({ socket, username, room }) {
   const [CurrentMessage, SetCurrentMessage] = useState("");
   const [MessageList, SetMessageList] = useState([]);
+
+  const FetchData = (room) => {
+    axios
+      .get("https://bens-test-node-app.herokuapp.com/" + room)
+      .then((res) => {
+        SetMessageList(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const AddData = (messageData) => {
+    axios
+      .post("https://bens-test-node-app.herokuapp.com/SaveMessage", {
+        ...messageData,
+      })
+      .then((res) => {
+        SetMessageList(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   const SendMessage = async () => {
     if (CurrentMessage !== "") {
@@ -18,15 +43,21 @@ function Chat({ socket, username, room }) {
       };
 
       await socket.emit("send_message", messageData);
-      SetMessageList((list) => [...list, messageData]);
+      AddData(messageData);
       SetCurrentMessage("");
     }
   };
 
   useEffect(() => {
+    FetchData(room);
+    // eslint-disable-next-line
+  }, []);
+
+  useEffect(() => {
     socket.on("receive-message", (data) => {
-      SetMessageList((list) => [...list, data]);
+      FetchData(data.room);
     });
+    // eslint-disable-next-line
   }, [socket]);
 
   return (
@@ -36,9 +67,10 @@ function Chat({ socket, username, room }) {
       </div>
       <div className="chat-body">
         <ScrollToBottom className="message-container">
-          {MessageList.map((messageContent) => {
+          {MessageList.map((messageContent, index) => {
             return (
               <div
+                key={index}
                 className="message"
                 id={username === messageContent.author ? "you" : "other"}
               >
